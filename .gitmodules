@@ -1,6 +1,8 @@
 [submodule "lib/hagl"]
 	path = external/hagl
-	url = https://github.com/tuupola/hagl.git
+	url = git@github.com:CHiPs44/hagl.git
+	branch = chips44
 [submodule "lib/hagl_hal"]
 	path = external/hagl_hal
-	url = https://github.com/tuupola/hagl_pico_mipi
+	url = git@github.com:CHiPs44/hagl_pico_vgaboard.git
+	branch = main

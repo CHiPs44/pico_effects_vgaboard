@@ -31,6 +31,8 @@ SPDX-License-Identifier: MIT-0
 #include <wchar.h>
 #include <pico/stdlib.h>
 #include <hardware/clocks.h>
+#include "pico/multicore.h"
+#include "hardware/vreg.h"
 
 #include <sys/time.h>
 
@@ -39,6 +41,9 @@ SPDX-License-Identifier: MIT-0
 #include <font6x9.h>
 #include <fps.h>
 #include <aps.h>
+#include <pico-vgaboard-palettes.h>
+#include <pico-vgaboard-palettes-sweetie16.h>
+#include <pico-vgaboard-modes-640x400.h>
 
 #include "metaballs.h"
 #include "plasma.h"
@@ -131,7 +136,7 @@ void static inline show_fps() {
     fps_flag = 0;
 
     /* Set clip window to full screen so we can display the messages. */
-    hagl_set_clip_window(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
+    hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
 
     /* Print the message on top left corner. */
     swprintf(message, sizeof(message), L"%s    ", demo[effect]);
@@ -146,7 +151,7 @@ void static inline show_fps() {
     hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
 
     /* Set clip window back to smaller so effects do not mess the messages. */
-    hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
 }
 
 int main()
@@ -164,7 +169,12 @@ int main()
     //     133000 * 1000
     // );
 
+    // vreg_set_voltage(VREG_VOLTAGE_1_20);
     stdio_init_all();
+    vgaboard_init();
+    vgaboard_setup(&vgaboard_320x200x4bpp);
+    vgaboard_set_palette(vgaboard_palette_4bpp_sweetie16);
+    vgaboard_dump(vgaboard);
 
     /* Sleep so that we have time to open the serial console. */
     sleep_ms(5000);
@@ -183,9 +193,14 @@ int main()
     // display = &backend;
 
     display = hagl_init();
+    vgaboard_enable();
+    multicore_launch_core1(vgaboard_render_loop);
 
     hagl_clear(display);
-    hagl_set_clip_window(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+
+    hagl_fill_rectangle_xywh(display, 16, 16, vgaboard->width - 32, vgaboard->height - 32, 12);
+    while (1) {}
 
     /* Change demo every 10 seconds. */
     add_repeating_timer_ms(10000, switch_timer_callback, NULL, &switch_timer);

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "pico-vgaboard-modes-640x400.h": "c",
+        "pico-vgaboard-palettes.h": "c"
+    }
+}
