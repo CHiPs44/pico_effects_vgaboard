@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "pico-vgaboard-modes-640x400.h": "c",
-        "pico-vgaboard-palettes.h": "c"
+        "pico-vgaboard-palettes.h": "c",
+        "hagl.h": "c",
+        "metaballs.h": "c",
+        "deform.h": "c"
     }
 }

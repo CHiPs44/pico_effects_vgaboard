@@ -75,7 +75,8 @@ target_compile_definitions(pico_effects_vgaboard PRIVATE
   # needed for 1024x768 modes?
   -DPICO_SCANVIDEO_MAX_SCANLINE_BUFFER_WORDS=514
   -DPICO_SCANVIDEO_SCANLINE_BUFFER_COUNT=8
-  -DUSE_INTERP=1
+  # -DUSE_INTERP=1
+  -DUSE_INTERP=0
   # TINY: OK for 640x400 based modes and below
   # -DPICO_VGABOARD_FRAMEBUFFER_SIZE=32768
   # NORMAL: OK for 640x480 based modes and below

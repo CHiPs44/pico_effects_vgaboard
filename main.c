@@ -73,23 +73,27 @@ static char demo[4][32] = {
     "DEFORM",
 };
 
-bool switch_timer_callback(struct repeating_timer *t) {
+bool switch_timer_callback(struct repeating_timer *t)
+{
     switch_flag = true;
     return true;
 }
 
-bool show_timer_callback(struct repeating_timer *t) {
+bool show_timer_callback(struct repeating_timer *t)
+{
     fps_flag = true;
     return true;
 }
 
-void static inline switch_demo() {
+void static inline switch_demo()
+{
     switch_flag = false;
 
-    switch(effect) {
+    switch (effect)
+    {
     case 0:
         printf("Closing metaballs.\n");
-        //metaballs_close();
+        // metaballs_close();
         break;
     case 1:
         printf("Closing plasma.\n");
@@ -97,7 +101,7 @@ void static inline switch_demo() {
         break;
     case 2:
         printf("Closing rotozoom.\n");
-        //rotozoom_close();
+        // rotozoom_close();
         break;
     case 3:
         printf("Closing deform.\n");
@@ -107,7 +111,8 @@ void static inline switch_demo() {
 
     effect = (effect + 1) % 4;
 
-    switch(effect) {
+    switch (effect)
+    {
     case 0:
         printf("Initialising metaballs.\n");
         metaballs_init();
@@ -130,13 +135,14 @@ void static inline switch_demo() {
     aps_init(&bps);
 }
 
-void static inline show_fps() {
+void static inline show_fps()
+{
     color_t green = hagl_color(display, 0, 255, 0);
 
     fps_flag = 0;
 
     /* Set clip window to full screen so we can display the messages. */
-    hagl_set_clip(display, 0, 0, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 1);
+    hagl_set_clip(display, 0, 0, display->width - 1, display->height - 1);
 
     /* Print the message on top left corner. */
     swprintf(message, sizeof(message), L"%s    ", demo[effect]);
@@ -144,14 +150,14 @@ void static inline show_fps() {
 
     /* Print the message on lower left corner. */
     swprintf(message, sizeof(message), L"%.*f FPS  ", 0, fps.current);
-    hagl_put_text(display, message, 4, DISPLAY_HEIGHT - 14, green, font6x9);
+    hagl_put_text(display, message, 4, display->height - 14, green, font6x9);
 
     /* Print the message on lower right corner. */
     swprintf(message, sizeof(message), L"%.*f KBPS  ", 0, bps.current / 1024);
-    hagl_put_text(display, message, DISPLAY_WIDTH - 60, DISPLAY_HEIGHT - 14, green, font6x9);
+    hagl_put_text(display, message, display->width - 60, display->height - 14, green, font6x9);
 
     /* Set clip window back to smaller so effects do not mess the messages. */
-    hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    hagl_set_clip(display, 0, 20, display->width - 1, display->height - 21);
 }
 
 int main()
@@ -182,13 +188,13 @@ int main()
     fps_init(&fps);
 
     // memset(&backend, 0, sizeof(hagl_backend_t));
-    // backend.buffer = malloc(MIPI_DISPLAY_WIDTH * MIPI_DISPLAY_HEIGHT * (DISPLAY_DEPTH / 8));
-    // backend.buffer2 = malloc(MIPI_DISPLAY_WIDTH * MIPI_DISPLAY_HEIGHT * (DISPLAY_DEPTH / 8));
+    // backend.buffer = malloc(MIPI_display->width * MIPI_display->height * (DISPLAY_DEPTH / 8));
+    // backend.buffer2 = malloc(MIPI_display->width * MIPI_display->height * (DISPLAY_DEPTH / 8));
     // hagl_hal_init(&backend);
     // display = &backend;
 
     // memset(&backend, 0, sizeof(hagl_backend_t));
-    // backend.buffer = malloc(MIPI_DISPLAY_WIDTH * MIPI_DISPLAY_HEIGHT * (DISPLAY_DEPTH / 8));
+    // backend.buffer = malloc(MIPI_display->width * MIPI_display->height * (DISPLAY_DEPTH / 8));
     // hagl_hal_init(&backend);
     // display = &backend;
 
@@ -197,10 +203,12 @@ int main()
     multicore_launch_core1(vgaboard_render_loop);
 
     hagl_clear(display);
-    hagl_set_clip(display, 0, 20, DISPLAY_WIDTH - 1, DISPLAY_HEIGHT - 21);
+    // hagl_set_clip(display, 0, 20, display->width - 1, display->height - 21);
 
-    hagl_fill_rectangle_xywh(display, 16, 16, vgaboard->width - 32, vgaboard->height - 32, 12);
-    while (1) {}
+    // hagl_fill_rectangle_xywh(display, 16, 16, vgaboard->width - 32, vgaboard->height - 32, 12);
+    // while (1)
+    // {
+    // }
 
     /* Change demo every 10 seconds. */
     add_repeating_timer_ms(10000, switch_timer_callback, NULL, &switch_timer);
@@ -208,11 +216,13 @@ int main()
     /* Update displayed FPS counter every 250 ms. */
     add_repeating_timer_ms(250, show_timer_callback, NULL, &show_timer);
 
-    while (1) {
+    while (1)
+    {
 
         uint64_t start = time_us_64();
 
-        switch(effect) {
+        switch (effect)
+        {
         case 0:
             metaballs_animate();
             metaballs_render(display);
@@ -232,7 +242,8 @@ int main()
         }
 
         /* Update the displayed fps if requested. */
-        if (fps_flag) {
+        if (fps_flag)
+        {
             show_fps();
         }
 
@@ -243,7 +254,8 @@ int main()
         fps_update(&fps);
 
         /* Print the message in console and switch to next demo. */
-        if (switch_flag) {
+        if (switch_flag)
+        {
             printf("%s at %d fps / %d kBps\r\n", demo[effect], (uint32_t)fps.current, (uint32_t)(bps.current / 1024));
             switch_demo();
         }
